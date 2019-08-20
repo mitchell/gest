@@ -26,14 +26,16 @@ func Test(name string, cases func(s *[]Subtest)) (output []Subtest) {
 
 	for idx, subtest := range output {
 		var s Subtest
+		test := subtest
+
 		s.Generator = func(args ...interface{}) TestFunc {
 			return func(t *testing.T) {
-				t.Log(subtest.message)
-				subtest.Generator(args...)(t)
+				t.Log(test.message)
+				test.Generator(args...)(t)
 			}
 		}
 
-		s.Name = name + "/" + subtest.Name
+		s.Name = name + "/" + test.Name
 		output[idx] = s
 	}
 
