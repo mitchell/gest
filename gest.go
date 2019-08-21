@@ -2,10 +2,14 @@ package gest
 
 import "testing"
 
+// TestFunc is the Go standard test function shape.
 type TestFunc func(t *testing.T)
 
+// TestFuncGenerator is a function that takes in arbitrary arguments and returns a test function
+// with access to them.
 type TestFuncGenerator func(args ...interface{}) TestFunc
 
+// Subtest represents a case in a test suite.
 type Subtest struct {
 	Name      string
 	Generator TestFuncGenerator
@@ -13,15 +17,18 @@ type Subtest struct {
 	message string
 }
 
+// Run runs the Subtest.
 func (s Subtest) Run(t *testing.T, args ...interface{}) {
 	t.Run(s.Name, s.Generator(args...))
 }
 
-func Describe(s *[]Subtest, name string, message string, generator TestFuncGenerator) {
+// Case creates a new test case.
+func Case(s *[]Subtest, name string, message string, generator TestFuncGenerator) {
 	*s = append(*s, Subtest{Name: name, Generator: generator, message: message})
 }
 
-func Test(name string, cases func(s *[]Subtest)) (output []Subtest) {
+// Test creates a new test suite and returns the cases.
+func Test(cases func(s *[]Subtest)) (output []Subtest) {
 	cases(&output)
 
 	for idx, subtest := range output {
@@ -34,8 +41,8 @@ func Test(name string, cases func(s *[]Subtest)) (output []Subtest) {
 				test.Generator(args...)(t)
 			}
 		}
+		s.Name = test.Name
 
-		s.Name = name + "/" + test.Name
 		output[idx] = s
 	}
 
